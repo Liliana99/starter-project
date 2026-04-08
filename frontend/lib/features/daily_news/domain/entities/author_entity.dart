@@ -9,6 +9,7 @@ class AuthorEntity extends Equatable {
   final String? bio;
   final List<String>? socialLinks;
   final String? status;
+  final int? yearsExperience;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -23,6 +24,7 @@ class AuthorEntity extends Equatable {
     this.status,
     this.createdAt,
     this.updatedAt,
+    this.yearsExperience,
   });
 
   @override
@@ -35,6 +37,7 @@ class AuthorEntity extends Equatable {
         bio,
         socialLinks,
         status,
+        yearsExperience,
         createdAt,
         updatedAt,
       ];
