@@ -1,10 +1,10 @@
-import 'package:floor/floor.dart';
+
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/author_entity.dart';
 
 part 'author_model.g.dart';
 
-@Entity(tableName: 'authors', primaryKeys: ['authorId'])
+
 @JsonSerializable()
 class AuthorModel extends AuthorEntity {
   const AuthorModel({

@@ -1,10 +1,9 @@
-import 'package:floor/floor.dart';
+
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/tag_entity.dart';
 
 part 'tag_model.g.dart';
 
-@Entity(tableName: 'tags', primaryKeys: ['id'])
 @JsonSerializable()
 class TagModel extends TagEntity {
   const TagModel({
