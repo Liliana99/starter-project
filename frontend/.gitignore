@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets — credenciales locales, nunca subir al repositorio
+lib/core/config/secrets.dart

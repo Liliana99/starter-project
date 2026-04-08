@@ -39,7 +39,8 @@ dependencies:
   # Firebase
   firebase_core: ^4.6.0
   cloud_firestore: ^6.2.0
-  firebase_storage: ^13.1.0
+
+
 
 
   #Hooks
@@ -51,6 +52,11 @@ dependencies:
   #json
   json_annotation: ^4.9.0
 
+  #database
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  file_picker: ^11.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -59,14 +65,40 @@ dev_dependencies:
   #floor_generator: ^1.5.0
   build_runner: ^2.4.13
   json_serializable: ^6.8.0
+  hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.1
+  mocktail: ^1.0.4
+  bloc_test: ^9.1.7
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 21 # android min sdk min:21, default 21
+  web:
+    generate: true
+    image_path: "assets/images/app_logo.png"
+    backgroundColor: "#1A1A40"
+    themeColor: "#1A1A40"
 
-
-
+flutter_native_splash:
+  color: "#1A1A40"
+  image: "assets/images/app_logo.png"
+  android: true
+  ios: true
+  web: false
+  
+  # Especial para Android 12+
+  android_12:
+    color: "#1A1A40"
+    image: "assets/images/app_logo.png"
 
 flutter:
-
   uses-material-design: true
+
+  assets:
+    - assets/images/
 
  
   fonts:
