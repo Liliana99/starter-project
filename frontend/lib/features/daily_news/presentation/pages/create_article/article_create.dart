@@ -10,7 +10,9 @@ import 'package:news_app_clean_architecture/features/daily_news/presentation/blo
 import 'package:news_app_clean_architecture/features/daily_news/presentation/widgets/navigation_bar.dart';
 
 class CreateArticlePage extends StatefulWidget {
-  const CreateArticlePage({super.key});
+  final ArticleEntity? article;
+
+  const CreateArticlePage({super.key, this.article});
 
   @override
   State<CreateArticlePage> createState() => _CreateArticlePageState();
@@ -27,20 +29,24 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments;
-      if (args is ArticleEntity) {
-        setState(() {
-          _editingArticle = args;
-          _headlineController.text = args.title ?? "";
-          _bodyController.text = args.content ?? "";
-          _imageUrl = args.thumbnailUrl;
-        });
 
-        if (args.tagIds != null) {
-          context.read<LocalArticleCubit>().onTagsChanged(args.tagIds!);
-        }
+    if (widget.article != null) {
+      _editingArticle = widget.article;
+      _headlineController.text = _editingArticle?.title ?? "";
+      _bodyController.text = _editingArticle?.content ?? "";
+      _imageUrl = _editingArticle?.thumbnailUrl;
+
+      if (_editingArticle?.tagIds != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context
+              .read<LocalArticleCubit>()
+              .onTagsChanged(_editingArticle!.tagIds!);
+        });
       }
+    }
+
+    _headlineController.addListener(() {
+      setState(() {});
     });
   }
 
@@ -102,7 +108,6 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
       authorId: "paco_editor_1",
     );
 
-    // Si hay bytes de imagen, se los pasamos al Cubit para que los suba
     if (_imageBytes != null) {
       context
           .read<LocalArticleCubit>()
@@ -125,13 +130,13 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
 
     return BlocListener<LocalArticleCubit, LocalArticleState>(
       listener: (context, state) {
-        if (state.status == LocalArticleStatus.success) {
+        if (state.status == LocalArticleStatus.publishedSuccess) {
           NotificationService.show(
             context,
             title: "Article Published Successfully!",
             message: "Your story is now live on the feed.",
           );
-          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, '/ManageArticle');
         }
 
         if (state.status == LocalArticleStatus.error) {
@@ -176,9 +181,9 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
                   _buildSectionLabel(theme, "ARTICLE BODY"),
                   const SizedBox(height: 8),
                   _buildBodyInput(theme, colorScheme),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: kIsWeb ? 300 : 48),
                   _buildPublishButton(colorScheme, isLoading),
-                  const SizedBox(height: 150),
+                  const SizedBox(height: kIsWeb ? 100 : 120),
                 ],
               ),
             );
@@ -198,7 +203,7 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "KINETIC EDITOR",
+              _editingArticle != null ? "EDITORIAL REVISION" : "KINETIC EDITOR",
               style: TextStyle(
                 color: colorScheme.tertiary,
                 fontWeight: FontWeight.bold,
@@ -207,7 +212,7 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
               ),
             ),
             Text(
-              "Publish Article",
+              _editingArticle != null ? "Update Article" : "Publish Article",
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontSize: 28,
                 color: const Color(0xFF1A1A2E),
@@ -220,11 +225,18 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
   }
 
   Widget _buildImagePlaceholder(ThemeData theme, ColorScheme colorScheme) {
-    return GestureDetector(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicHeight = (screenWidth * 0.3).clamp(180.0, 320.0);
+    final isWideScreen = screenWidth > 1100;
+
+    return Center(
+        child: GestureDetector(
       onTap: _pickImage,
       child: Container(
+        constraints:
+            BoxConstraints(maxWidth: isWideScreen ? 800 : double.infinity),
         width: double.infinity,
-        height: 160,
+        height: dynamicHeight,
         decoration: BoxDecoration(
           color: colorScheme.tertiary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
@@ -268,7 +280,7 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
               )
             : null,
       ),
-    );
+    ));
   }
 
   Widget _buildSectionLabel(ThemeData theme, String label) {
@@ -368,7 +380,6 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
           const SizedBox(height: 16),
         ],
 
-        // 3. Campo para agregar tag personalizado
         Row(
           children: [
             Expanded(
@@ -448,11 +459,14 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
   }
 
   Widget _buildPublishButton(ColorScheme colorScheme, bool isLoading) {
+    final bool isTitleEmpty = _headlineController.text.trim().isEmpty;
+    final bool isEnabled = !isLoading && !isTitleEmpty;
+
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        onPressed: isLoading ? null : _onPublishPressed,
+        onPressed: isEnabled ? _onPublishPressed : null,
         icon: isLoading
             ? const SizedBox(
                 width: 20,
@@ -462,7 +476,11 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
               )
             : const Icon(Icons.cloud_upload_outlined, size: 20),
         label: Text(
-          isLoading ? "PUBLISHING..." : "PUBLISH ARTICLE",
+          isLoading
+              ? "PUBLISHING..."
+              : (_editingArticle != null
+                  ? "UPDATE ARTICLE"
+                  : "PUBLISH ARTICLE"),
           style:
               const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
         ),

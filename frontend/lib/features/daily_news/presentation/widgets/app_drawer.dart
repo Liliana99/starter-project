@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:news_app_clean_architecture/core/services/profile_service.dart';
 
 class KineticDrawer extends StatelessWidget {
   const KineticDrawer({super.key});
@@ -8,7 +9,7 @@ class KineticDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.85,
+      width: (MediaQuery.of(context).size.width * 0.85).clamp(280.0, 350.0),
       backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
@@ -21,7 +22,17 @@ class KineticDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 32),
-                    _buildUserProfile(),
+                    FutureBuilder<Map<String, String?>>(
+                      future: ProfileService.getProfile(),
+                      builder: (context, snapshot) {
+                        final data = snapshot.data;
+                        return _buildUserProfile(
+                          name: data?['name'] ?? "Julian Vance",
+                          imageUrl: data?['imageUrl'] ??
+                              'https://i.pravatar.cc/150?u=julian',
+                        );
+                      },
+                    ),
                     const SizedBox(height: 48),
                     _buildSectionHeader("EDITORIAL DESK"),
                     _buildDrawerItem(Icons.trending_up, "Technology",
@@ -75,7 +86,7 @@ class KineticDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildUserProfile() {
+  Widget _buildUserProfile({required String name, required String imageUrl}) {
     return Row(
       children: [
         Container(
@@ -84,25 +95,26 @@ class KineticDrawer extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: const Color(0xFFE0E3FF), width: 2),
           ),
-          child: const CircleAvatar(
+          child: CircleAvatar(
             radius: 28,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=julian'),
+            backgroundImage: NetworkImage(imageUrl),
+            backgroundColor: const Color(0xFFE8E8F3),
           ),
         ),
         const SizedBox(width: 16),
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Julian Thorne",
-              style: TextStyle(
+              name,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF1A1A40),
               ),
             ),
-            Text(
-              "Premium Subscriber",
+            const Text(
+              "Premium Status",
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,

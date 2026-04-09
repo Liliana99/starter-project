@@ -1,4 +1,4 @@
-import 'dart:io';
+// import 'dart:io'; // Eliminado para compatibilidad web
 import 'package:flutter/material.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
 
@@ -16,6 +16,9 @@ class ArticleFeedTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicHeight = (screenWidth * 0.25).clamp(200.0, 400.0);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 32),
       child: Column(
@@ -25,7 +28,7 @@ class ArticleFeedTile extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: _buildThumbnail(article.thumbnailUrl),
+                child: _buildThumbnail(article.thumbnailUrl, dynamicHeight),
               ),
               if (isUserArticle)
                 Positioned(
@@ -119,9 +122,7 @@ class ArticleFeedTile extends StatelessWidget {
     );
   }
 
-  Widget _buildThumbnail(String? url) {
-    const double height = 220;
-
+  Widget _buildThumbnail(String? url, double height) {
     if (url == null || url.isEmpty) {
       return _placeholder(height);
     }
@@ -129,18 +130,6 @@ class ArticleFeedTile extends StatelessWidget {
     if (url.startsWith('http')) {
       return Image.network(
         url,
-        height: height,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(height),
-      );
-    }
-
-    // Ruta local
-    final file = File(url);
-    if (file.existsSync()) {
-      return Image.file(
-        file,
         height: height,
         width: double.infinity,
         fit: BoxFit.cover,

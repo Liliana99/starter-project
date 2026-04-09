@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
+import 'package:news_app_clean_architecture/features/daily_news/presentation/pages/create_article/article_create.dart';
+import 'package:news_app_clean_architecture/features/daily_news/presentation/pages/manage_article/article_edit.dart';
 import 'package:news_app_clean_architecture/features/daily_news/presentation/widgets/app_drawer.dart';
 import 'package:news_app_clean_architecture/features/daily_news/presentation/widgets/navigation_bar.dart';
 import '../../bloc/article/local/local_article_cubit.dart';
@@ -10,6 +12,7 @@ import '../../widgets/profile_header.dart';
 import '../../widgets/profile_stats.dart';
 import '../../widgets/growth_insight_card.dart';
 import '../../widgets/manage_article_tile.dart';
+import 'package:news_app_clean_architecture/core/services/profile_service.dart';
 
 class ManageArticlePage extends StatefulWidget {
   const ManageArticlePage({super.key});
@@ -57,17 +60,25 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/Profile');
+                FutureBuilder<Map<String, String?>>(
+                  future: ProfileService.getProfile(),
+                  builder: (context, snapshot) {
+                    final data = snapshot.data;
+                    return GestureDetector(
+                      onTap: () async {
+                        await Navigator.pushNamed(context, '/Profile');
+                        setState(() {}); // Refrescar al volver
+                      },
+                      child: ProfileHeader(
+                        name: data?['name'] ?? "Julian Vance",
+                        role: "SENIOR EDITOR",
+                        bio: data?['bio'] ??
+                            "Exploring the digital landscapes...",
+                        imageUrl: data?['imageUrl'] ??
+                            'https://i.pravatar.cc/400?u=julian',
+                      ),
+                    );
                   },
-                  child: const ProfileHeader(
-                    name: "Julian Vance",
-                    role: "SENIOR EDITOR",
-                    bio:
-                        "Exploring the intersection of kinetic energy and digital landscapes. Deciphering the pulse of modern technology through an editorial lens since 2018.",
-                    imageUrl: 'https://i.pravatar.cc/400?u=julian',
-                  ),
                 ),
                 const ProfileStats(
                   articles: "48",
@@ -97,10 +108,12 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
                             article: article,
                             onDelete: () => _showDeleteDialog(context, article),
                             onEdit: () {
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                '/CreateArticle',
-                                arguments: article,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditArticlePage(article: article),
+                                ),
                               );
                             },
                           );

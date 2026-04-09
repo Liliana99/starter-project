@@ -21,6 +21,8 @@ class ManageArticleTile extends StatelessWidget {
 
     final iconSize = (screenWidth * 0.03).clamp(18.0, 32.0);
 
+    final thumbnailHeight = (screenWidth * 0.22).clamp(180.0, 350.0);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
@@ -42,7 +44,7 @@ class ManageArticleTile extends StatelessWidget {
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(24)),
-                child: _buildThumbnail(article.thumbnailUrl),
+                child: _buildThumbnail(article.thumbnailUrl, thumbnailHeight),
               ),
               Positioned(
                 top: 16,
@@ -55,7 +57,9 @@ class ManageArticleTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    (article.tagIds?.first ?? "TECH").toUpperCase(),
+                    (article.tagIds != null && article.tagIds!.isNotEmpty)
+                        ? article.tagIds!.first.toUpperCase()
+                        : "TECH",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 8,
@@ -170,9 +174,7 @@ class ManageArticleTile extends StatelessWidget {
     );
   }
 
-  Widget _buildThumbnail(String? url) {
-    const double height = 200;
-
+  Widget _buildThumbnail(String? url, double height) {
     if (url == null || url.isEmpty) {
       return _placeholder(height);
     }

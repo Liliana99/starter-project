@@ -54,12 +54,14 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HomeHero(article: articles.first),
+                if (articles.isNotEmpty) 
+                  HomeHero(article: articles.first),
                 const SizedBox(height: 24),
                 _buildCategoryFilter(),
                 const SizedBox(height: 32),
                 _buildFeedHeader(),
-                ListView.builder(
+                if (articles.length > 1) 
+                  ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
