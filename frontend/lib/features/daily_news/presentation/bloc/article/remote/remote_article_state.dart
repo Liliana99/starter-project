@@ -1,25 +1,31 @@
 import 'package:equatable/equatable.dart';
-import 'package:dio/dio.dart';
 import '../../../../domain/entities/article.dart';
 
-abstract class RemoteArticlesState extends Equatable {
-  final List<ArticleEntity> ? articles;
-  final DioError ? error;
-  
-  const RemoteArticlesState({this.articles,this.error});
-  
+enum RemoteArticleStatus { initial, loading, success, error }
+
+class RemoteArticleState extends Equatable {
+  final List<ArticleEntity> articles;
+  final RemoteArticleStatus status;
+  final String? errorMessage;
+
+  const RemoteArticleState({
+    this.articles = const [],
+    this.status = RemoteArticleStatus.initial,
+    this.errorMessage,
+  });
+
+  RemoteArticleState copyWith({
+    List<ArticleEntity>? articles,
+    RemoteArticleStatus? status,
+    String? errorMessage,
+  }) {
+    return RemoteArticleState(
+      articles: articles ?? this.articles,
+      status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
+
   @override
-  List<Object> get props => [articles!, error!];
-}
-
-class RemoteArticlesLoading extends RemoteArticlesState {
-  const RemoteArticlesLoading();
-}
-
-class RemoteArticlesDone extends RemoteArticlesState {
-  const RemoteArticlesDone(List<ArticleEntity> article) : super(articles: article);
-}
-
-class RemoteArticlesError extends RemoteArticlesState {
-  const RemoteArticlesError(DioError error) : super(error: error);
+  List<Object?> get props => [articles, status, errorMessage];
 }
