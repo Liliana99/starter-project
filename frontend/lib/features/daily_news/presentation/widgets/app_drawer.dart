@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class KineticDrawer extends StatelessWidget {
   const KineticDrawer({super.key});
@@ -174,7 +175,12 @@ class KineticDrawer extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                SystemNavigator.pop();
+                if (kIsWeb) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/', (route) => false);
+                } else {
+                  SystemNavigator.pop();
+                }
               },
               icon:
                   const Icon(Icons.logout, color: Color(0xFFE11D48), size: 18),

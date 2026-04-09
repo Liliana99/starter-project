@@ -43,8 +43,10 @@ class _HomePageState extends State<HomePage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final articles =
-              state.articles.isEmpty ? _getMockArticles() : state.articles;
+          final firestoreArticles = state.articles;
+          final mockArticles = _getMockArticles();
+
+          final articles = [...firestoreArticles, ...mockArticles];
 
           return SingleChildScrollView(
             child: Column(
