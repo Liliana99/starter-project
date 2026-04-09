@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
 
@@ -17,6 +17,9 @@ class ManageArticleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final iconSize = (screenWidth * 0.03).clamp(18.0, 32.0);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -84,14 +87,17 @@ class ManageArticleTile extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: onEdit,
-                          child: const Icon(Icons.edit,
-                              size: 18, color: Color(0xFF5C79FF)),
+                          child: Icon(Icons.edit,
+                              size: iconSize, color: const Color(0xFF5C79FF)),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(
+                            width: screenWidth * 0.02 > 8
+                                ? screenWidth * 0.02
+                                : 16),
                         GestureDetector(
                           onTap: onDelete,
-                          child: const Icon(Icons.delete,
-                              size: 18, color: Color(0xFFC84B1F)),
+                          child: Icon(Icons.delete,
+                              size: iconSize, color: const Color(0xFFC84B1F)),
                         ),
                       ],
                     ),
@@ -163,10 +169,7 @@ class ManageArticleTile extends StatelessWidget {
       ),
     );
   }
-  /// Muestra la imagen correctamente según su origen:
-  /// - URL remota (Cloudinary): usa [Image.network]
-  /// - Ruta local (archivo del dispositivo): usa [Image.file]
-  /// - Sin imagen: muestra un placeholder
+
   Widget _buildThumbnail(String? url) {
     const double height = 200;
 
@@ -188,18 +191,6 @@ class ManageArticleTile extends StatelessWidget {
                 child: const Center(
                     child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-        errorBuilder: (_, __, ___) => _placeholder(height),
-      );
-    }
-
-    // Ruta local
-    final file = File(url);
-    if (file.existsSync()) {
-      return Image.file(
-        file,
-        height: height,
-        width: double.infinity,
-        fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => _placeholder(height),
       );
     }

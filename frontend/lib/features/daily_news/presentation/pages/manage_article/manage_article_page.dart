@@ -27,6 +27,9 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = (screenWidth * 0.03).clamp(18.0, 24.0);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: true,
@@ -75,7 +78,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
                   onPressed: () =>
                       Navigator.pushNamed(context, '/CreateArticle'),
                 ),
-                _buildStoriesHeader(),
+                _buildStoriesHeader(iconSize),
                 state.status == LocalArticleStatus.loading
                     ? const Center(
                         child: Padding(
@@ -160,7 +163,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
     );
   }
 
-  Widget _buildStoriesHeader() {
+  Widget _buildStoriesHeader(double iconSize) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
       child: Column(
@@ -180,10 +183,11 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
               ),
               Row(
                 children: [
-                  _iconBox(Icons.grid_view_rounded, isSelected: true),
+                  _iconBox(Icons.grid_view_rounded,
+                      isSelected: true, size: iconSize),
                   const SizedBox(width: 4),
                   _iconBox(Icons.format_list_bulleted_rounded,
-                      isSelected: false),
+                      isSelected: false, size: iconSize),
                 ],
               ),
             ],
@@ -198,7 +202,8 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
     );
   }
 
-  Widget _iconBox(IconData icon, {required bool isSelected}) {
+  Widget _iconBox(IconData icon,
+      {required bool isSelected, required double size}) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
@@ -206,7 +211,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(icon,
-          size: 18,
+          size: size,
           color:
               isSelected ? const Color(0xFF5C79FF) : const Color(0xFFC0C0D6)),
     );

@@ -31,6 +31,18 @@ class ProfileHeader extends StatelessWidget {
                     width: 220,
                     height: 220,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 220,
+                        height: 220,
+                        color: const Color(0xFFE8E8F3),
+                        child: const Icon(
+                          Icons.person,
+                          size: 80,
+                          color: Color(0xFFC0C0D6),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Positioned(
