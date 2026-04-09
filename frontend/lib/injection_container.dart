@@ -32,7 +32,7 @@ Future<void> initializeDependencies() async {
     () => ArticleRepositoryImpl(
       sl<NewsApiService>(), // 1. newsApiService
       sl<LocalStorageService>(), // 2. localStorageService
-      sl<FirebaseFirestore>(), // 3. firestore
+      sl<FirebaseFirestore>(), // 3. firestore   
     ),
   );
 
@@ -44,8 +44,8 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<SearchArticleUseCase>(
       () => SearchArticleUseCase(sl()));
 
-  sl.registerFactory<RemoteArticleCubit>(
-      () => RemoteArticleCubit(sl(), sl(), sl()));
+  sl.registerFactory<RemoteArticleCubit>( () => RemoteArticleCubit(sl(), sl(), sl()));
+  
   sl.registerFactory<LocalArticleCubit>(
     () => LocalArticleCubit(
       sl<GetSavedArticleUseCase>(),
