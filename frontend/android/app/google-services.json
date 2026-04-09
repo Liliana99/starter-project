@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "444388022308",
+    "project_id": "simetry-app",
+    "storage_bucket": "simetry-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444388022308:android:919c4b2d1ce3ab9ac260b1",
+        "android_client_info": {
+          "package_name": "com.example.news_app_clean_architecture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCokv07zAyV4KpPmbF-zB1k23lD_QyMwTY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

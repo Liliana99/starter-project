@@ -1,51 +1,110 @@
-import 'package:floor/floor.dart';
+import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
-import '../../../../core/constants/constants.dart';
 
-@Entity(tableName: 'article',primaryKeys: ['id'])
+part 'article.g.dart';
+
+@JsonSerializable()
+@HiveType(typeId: 0)
 class ArticleModel extends ArticleEntity {
-  const ArticleModel({
-    int ? id,
-    String ? author,
-    String ? title,
-    String ? description,
-    String ? url,
-    String ? urlToImage,
-    String ? publishedAt,
-    String ? content,
-  }): super(
-    id: id,
-    author: author,
-    title: title,
-    description: description,
-    url: url,
-    urlToImage: urlToImage,
-    publishedAt: publishedAt,
-    content: content,
-  );
+  @override
+  @HiveField(0)
+  final String? id;
 
-  factory ArticleModel.fromJson(Map < String, dynamic > map) {
+  @override
+  @HiveField(1)
+  final String? authorId;
+
+  @override
+  @HiveField(2)
+  final String? title;
+
+  @override
+  @HiveField(3)
+  final String? content;
+
+  @override
+  @HiveField(4)
+  final String? thumbnailUrl;
+
+  @override
+  @HiveField(5)
+  final List<String>? tagIds;
+
+  @override
+  @HiveField(6)
+  final String? status;
+
+  @override
+  @HiveField(7)
+  final DateTime? createdAt;
+
+  @override
+  @HiveField(8)
+  final int? avgReadTime;
+
+  const ArticleModel({
+    this.id,
+    this.authorId,
+    this.title,
+    this.content,
+    this.thumbnailUrl,
+    this.tagIds,
+    this.status,
+    this.createdAt,
+    this.avgReadTime,
+  }) : super(
+          id: id,
+          authorId: authorId,
+          title: title,
+          content: content,
+          thumbnailUrl: thumbnailUrl,
+          tagIds: tagIds,
+          status: status,
+          createdAt: createdAt,
+          avgReadTime: avgReadTime,
+        );
+
+  ArticleModel copyWith({
+    String? id,
+    String? authorId,
+    String? title,
+    String? content,
+    String? thumbnailUrl,
+    List<String>? tagIds,
+    String? status,
+    DateTime? createdAt,
+    int? avgReadTime,
+  }) {
     return ArticleModel(
-      author: map['author'] ?? "",
-      title: map['title'] ?? "",
-      description: map['description'] ?? "",
-      url: map['url'] ?? "",
-      urlToImage: map['urlToImage'] != null && map['urlToImage'] != "" ? map['urlToImage'] : kDefaultImage,
-      publishedAt: map['publishedAt'] ?? "",
-      content: map['content'] ?? "",
+      id: id ?? this.id,
+      authorId: authorId ?? this.authorId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      tagIds: tagIds ?? this.tagIds,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      avgReadTime: avgReadTime ?? this.avgReadTime,
     );
   }
+
+  factory ArticleModel.fromJson(Map<String, dynamic> json) =>
+      _$ArticleModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ArticleModelToJson(this);
 
   factory ArticleModel.fromEntity(ArticleEntity entity) {
     return ArticleModel(
       id: entity.id,
-      author: entity.author,
+      authorId: entity.authorId,
       title: entity.title,
-      description: entity.description,
-      url: entity.url,
-      urlToImage: entity.urlToImage,
-      publishedAt: entity.publishedAt,
-      content: entity.content
+      content: entity.content,
+      thumbnailUrl: entity.thumbnailUrl,
+      tagIds: entity.tagIds,
+      status: entity.status,
+      createdAt: entity.createdAt,
+      avgReadTime: entity.avgReadTime,
     );
   }
 }
