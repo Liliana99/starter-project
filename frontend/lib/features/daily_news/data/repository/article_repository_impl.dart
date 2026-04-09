@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:news_app_clean_architecture/core/constants/constants.dart';
@@ -73,24 +74,8 @@ class ArticleRepositoryImpl implements ArticleRepository {
           ? article.id!
           : _firestore.collection('articles').doc().id;
 
-      String? finalImageUrl = article.thumbnailUrl;
-
-      if (article.thumbnailUrl != null &&
-          article.thumbnailUrl!.isNotEmpty &&
-          !article.thumbnailUrl!.startsWith('http')) {
-        final file = File(article.thumbnailUrl!);
-
-        if (!await file.exists()) {
-          throw Exception(
-              "El archivo no existe en la ruta local: ${article.thumbnailUrl}");
-        }
-
-        finalImageUrl = await CloudinaryService.uploadImage(file);
-      }
-
       final articleModel = ArticleModel.fromEntity(article).copyWith(
         id: confirmedId,
-        thumbnailUrl: finalImageUrl,
       );
 
       final json = articleModel.toJson();
@@ -192,5 +177,10 @@ class ArticleRepositoryImpl implements ArticleRepository {
     } catch (e) {
       throw Exception("Error al eliminar el artículo de Firestore: $e");
     }
+  }
+
+  @override
+  Future<String> uploadImageBytes(Uint8List bytes) async {
+    return await CloudinaryService.uploadImage(bytes);
   }
 }

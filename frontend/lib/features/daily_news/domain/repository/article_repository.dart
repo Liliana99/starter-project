@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:news_app_clean_architecture/core/resources/data_state.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
 
@@ -13,4 +14,6 @@ abstract class ArticleRepository {
 
   Future<List<ArticleEntity>> getRemotePublishedArticles();
   Future<void> deleteRemoteArticle(String id);
+
+  Future<String> uploadImageBytes(Uint8List bytes);
 }

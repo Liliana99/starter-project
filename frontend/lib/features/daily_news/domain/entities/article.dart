@@ -35,7 +35,30 @@ class ArticleEntity extends Equatable {
       status,
       createdAt,
       avgReadTime,
-      content,
     ];
+  }
+
+  ArticleEntity copyWith({
+    String? id,
+    String? authorId,
+    String? title,
+    String? content,
+    String? thumbnailUrl,
+    List<String>? tagIds,
+    String? status,
+    DateTime? createdAt,
+    int? avgReadTime,
+  }) {
+    return ArticleEntity(
+      id: id ?? this.id,
+      authorId: authorId ?? this.authorId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      tagIds: tagIds ?? this.tagIds,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      avgReadTime: avgReadTime ?? this.avgReadTime,
+    );
   }
 }

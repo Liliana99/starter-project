@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/repository/article_repository.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/usecases/publish_article.dart';
@@ -26,10 +27,18 @@ class LocalArticleCubit extends Cubit<LocalArticleState> {
     emit(state.copyWith(tempTags: tags, status: LocalArticleStatus.initial));
   }
 
-  Future<void> onPublishArticle(ArticleEntity article) async {
+  Future<void> onPublishArticle(ArticleEntity article, {Uint8List? imageBytes}) async {
     emit(state.copyWith(status: LocalArticleStatus.loading));
     try {
-      await _publishArticleUseCase(params: article);
+      String? finalImageUrl = article.thumbnailUrl;
+
+      // Si tenemos bytes nuevos (de la selección), los subimos primero
+      if (imageBytes != null) {
+        finalImageUrl = await _articleRepository.uploadImageBytes(imageBytes);
+      }
+
+      final articleWithImage = article.copyWith(thumbnailUrl: finalImageUrl);
+      await _publishArticleUseCase(params: articleWithImage);
 
       await onGetSavedArticles();
 

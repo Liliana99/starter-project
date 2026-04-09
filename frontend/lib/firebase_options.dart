@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -59,4 +56,14 @@ class DefaultFirebaseOptions {
     projectId: 'simetry-app',
     storageBucket: 'simetry-app.firebasestorage.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBI8tWdz93C-1hG8oqXBmSphnk6wMWuh9s',
+    appId: '1:444388022308:web:a62a05db6b13fa0bc260b1',
+    messagingSenderId: '444388022308',
+    projectId: 'simetry-app',
+    authDomain: 'simetry-app.firebaseapp.com',
+    storageBucket: 'simetry-app.firebasestorage.app',
+  );
+
 }

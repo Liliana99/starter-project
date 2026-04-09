@@ -1,21 +1,22 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:news_app_clean_architecture/core/config/secrets.dart';
 
 class CloudinaryService {
   static final Dio _dio = Dio();
 
-  static Future<String> uploadImage(File imageFile,
-      {String folder = 'articles'}) async {
+  static Future<String> uploadImage(Uint8List imageBytes,
+      {String folder = 'articles', String? fileName}) async {
     const cloudName = Secrets.cloudinaryCloudName;
     const uploadPreset = Secrets.cloudinaryUploadPreset;
 
     final url = 'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
 
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(
-        imageFile.path,
-        filename: imageFile.uri.pathSegments.last,
+      'file': MultipartFile.fromBytes(
+        imageBytes,
+        filename:
+            fileName ?? 'upload_${DateTime.now().millisecondsSinceEpoch}.jpg',
       ),
       'upload_preset': uploadPreset,
       'folder': folder,

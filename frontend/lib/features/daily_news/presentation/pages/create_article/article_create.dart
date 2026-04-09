@@ -1,7 +1,6 @@
-import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
-
+import 'package:flutter/foundation.dart'; // Para kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_clean_architecture/core/services/notification_service.dart';
@@ -22,6 +21,7 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
   final TextEditingController _bodyController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
   String? _imageUrl;
+  Uint8List? _imageBytes; // Para soporte Web
   ArticleEntity? _editingArticle;
 
   @override
@@ -57,23 +57,15 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
       FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.image,
         allowMultiple: false,
+        withData: true, // Importante para Web
       );
 
-      if (result != null && result.files.single.path != null) {
-        final String path = result.files.single.path!;
-
-        if (await File(path).exists()) {
-          setState(() {
-            _imageUrl = path;
-          });
-        } else {
-          NotificationService.show(
-            context,
-            title: "Error",
-            message: "Selected file is not accessible",
-            isError: true,
-          );
-        }
+      if (result != null) {
+        setState(() {
+          _imageBytes = result.files.single.bytes;
+          _imageUrl = result
+              .files.single.name; // Usamos el nombre como referencia temporal
+        });
       }
     } catch (e) {
       NotificationService.show(
@@ -99,17 +91,25 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
     final currentTags = currentState.tempTags ?? [];
 
     final article = ArticleEntity(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _editingArticle?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       title: _headlineController.text.trim(),
       content: _bodyController.text.trim(),
-      createdAt: DateTime.now(),
+      createdAt: _editingArticle?.createdAt ?? DateTime.now(),
       status: "published",
       tagIds: currentTags,
       thumbnailUrl: _imageUrl,
       authorId: "paco_editor_1",
     );
 
-    context.read<LocalArticleCubit>().onPublishArticle(article);
+    // Si hay bytes de imagen, se los pasamos al Cubit para que los suba
+    if (_imageBytes != null) {
+      context
+          .read<LocalArticleCubit>()
+          .onPublishArticle(article, imageBytes: _imageBytes);
+    } else {
+      context.read<LocalArticleCubit>().onPublishArticle(article);
+    }
   }
 
   void _showErrorSnackBar(String message) {
@@ -228,20 +228,25 @@ class _CreateArticlePageState extends State<CreateArticlePage> {
         decoration: BoxDecoration(
           color: colorScheme.tertiary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
-          image: _imageUrl != null
+          image: _imageBytes != null
               ? DecorationImage(
-                  image: FileImage(File(_imageUrl!)),
+                  image: MemoryImage(_imageBytes!),
                   fit: BoxFit.cover,
                 )
-              : null,
+              : (_imageUrl != null && _imageUrl!.startsWith('http'))
+                  ? DecorationImage(
+                      image: NetworkImage(_imageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
           border: Border.all(
-            color:
-                colorScheme.tertiary.withOpacity(_imageUrl != null ? 0 : 0.2),
+            color: colorScheme.tertiary.withOpacity(
+                _imageUrl != null || _imageBytes != null ? 0 : 0.2),
             style: BorderStyle.solid,
             width: 1,
           ),
         ),
-        child: _imageUrl == null
+        child: (_imageUrl == null && _imageBytes == null)
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
