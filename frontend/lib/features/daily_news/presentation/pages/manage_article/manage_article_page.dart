@@ -111,8 +111,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditArticlePage(article: article),
+                                  builder: (context) => EditArticlePage(article: article),
                                 ),
                               );
                             },
@@ -146,7 +145,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
             Text(
               article.title ?? "",
               style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.bold ,
                   fontSize: 14,
                   color: Colors.grey),
               maxLines: 1,
@@ -163,7 +162,7 @@ class _ManageArticlePageState extends State<ManageArticlePage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFC84B1F),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12) ),
             ),
             onPressed: () {
               context.read<LocalArticleCubit>().onRemoveArticle(article);
