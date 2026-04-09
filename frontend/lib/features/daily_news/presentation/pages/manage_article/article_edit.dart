@@ -32,7 +32,6 @@ class _EditArticlePageState extends State<EditArticlePage> {
     super.initState();
     _editingArticle = widget.article;
 
-    // Inicializamos controladores con los datos de la noticia
     _headlineController = TextEditingController(text: _editingArticle.title);
     _bodyController = TextEditingController(text: _editingArticle.content);
     _imageUrl = _editingArticle.thumbnailUrl;
@@ -107,7 +106,7 @@ class _EditArticlePageState extends State<EditArticlePage> {
             title: "Article Updated!",
             message: "Changes saved successfully.",
           );
-          Navigator.pop(context); // Volvemos a Manage
+          Navigator.pop(context); 
         }
       },
       child: Scaffold(
