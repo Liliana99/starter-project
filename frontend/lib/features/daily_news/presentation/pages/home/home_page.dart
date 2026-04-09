@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/entities/article.dart';
 import 'package:news_app_clean_architecture/features/daily_news/presentation/widgets/article_feed_title.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -111,7 +113,12 @@ class _HomePageState extends State<HomePage> {
                 border: InputBorder.none,
               ),
               onChanged: (val) {
-                context.read<RemoteArticleCubit>().onSearchRemote(val);
+                if (_debounce?.isActive ?? false) _debounce?.cancel();
+                _debounce = Timer(const Duration(milliseconds: 500), () {
+                  if (mounted) {
+                    context.read<RemoteArticleCubit>().onSearchRemote(val);
+                  }
+                });
               },
             )
           : const Text("KINETIC",
