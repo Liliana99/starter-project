@@ -1,4 +1,4 @@
-# 🚀 Kinetic News App
+#  Kinetic News App
 Un lector de noticias multiplataforma (Móvil y Web) diseñado con arquitectura limpia (**Clean Architecture**), persistencia local y sincronización con la nube.
 
 ### 🌐 Live Web Demo
@@ -22,7 +22,7 @@ Un lector de noticias multiplataforma (Móvil y Web) diseñado con arquitectura 
 
 ---
 
-## 🚀 Cómo empezar
+##  Cómo empezar
 
 1. **Clonar el repositorio**
    ```bash
