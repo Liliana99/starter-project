@@ -27,7 +27,8 @@ class LocalArticleCubit extends Cubit<LocalArticleState> {
     emit(state.copyWith(tempTags: tags, status: LocalArticleStatus.initial));
   }
 
-  Future<void> onPublishArticle(ArticleEntity article, {Uint8List? imageBytes}) async {
+  Future<void> onPublishArticle(ArticleEntity article,
+      {Uint8List? imageBytes}) async {
     emit(state.copyWith(status: LocalArticleStatus.loading));
     try {
       String? finalImageUrl = article.thumbnailUrl;
@@ -40,10 +41,26 @@ class LocalArticleCubit extends Cubit<LocalArticleState> {
       final articleWithImage = article.copyWith(thumbnailUrl: finalImageUrl);
       await _publishArticleUseCase(params: articleWithImage);
 
-      await onGetSavedArticles();
+      List<ArticleEntity> remoteArticles = [];
+      try {
+        remoteArticles = await _articleRepository.getRemotePublishedArticles();
+      } catch (_) {}
+      final localArticles = await _getSavedArticleUseCase();
+      final remoteIds = remoteArticles.map((a) => a.id).toSet();
+      final onlyLocal =
+          localArticles.where((a) => !remoteIds.contains(a.id)).toList();
+      final merged = [...remoteArticles, ...onlyLocal];
+
+      merged.sort((a, b) {
+        final dateA = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final dateB = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return dateB.compareTo(dateA);
+      });
 
       emit(state.copyWith(
-        status: LocalArticleStatus.success,
+        status: LocalArticleStatus.publishedSuccess,
+        articles: merged,
+        allAvailableTags: _extractUniqueTags(merged),
         tempTags: [],
       ));
     } catch (e) {

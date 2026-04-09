@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../../../domain/entities/article.dart';
 
-enum LocalArticleStatus { initial, loading, success, error }
+enum LocalArticleStatus { initial, loading, success, error, publishedSuccess }
 
 class LocalArticleState extends Equatable {
   final List<ArticleEntity> articles;

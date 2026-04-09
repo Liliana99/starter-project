@@ -1,8 +1,10 @@
-import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart'; // Para kIsWeb
 import 'package:flutter/material.dart';
 import 'package:news_app_clean_architecture/core/services/notification_service.dart';
+import 'package:news_app_clean_architecture/core/services/profile_service.dart';
+import 'package:news_app_clean_architecture/core/services/cloudinary_service.dart';
 import '../../widgets/navigation_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -20,6 +22,22 @@ class _ProfilePageState extends State<ProfilePage> {
           "Digital curator and tech enthusiast exploring the boundaries of kinetic design and modern storytelling.");
 
   String? _imageUrl;
+  Uint8List? _imageBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await ProfileService.getProfile();
+    setState(() {
+      _nameController.text = profile['name'] ?? '';
+      _bioController.text = profile['bio'] ?? '';
+      _imageUrl = profile['imageUrl'];
+    });
+  }
 
   @override
   void dispose() {
@@ -85,31 +103,30 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildAvatarSection() {
+    ImageProvider? imageProvider;
+
+    if (_imageBytes != null) {
+      imageProvider = MemoryImage(_imageBytes!);
+    } else if (_imageUrl != null && _imageUrl!.startsWith('http')) {
+      imageProvider = NetworkImage(_imageUrl!);
+    } else {
+      imageProvider = const NetworkImage('https://i.pravatar.cc/300?u=julian');
+    }
+
     return Center(
       child: Stack(
         children: [
           Container(
             padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
-              image: _imageUrl != null
-                  ? DecorationImage(
-                      image: FileImage(File(_imageUrl!)),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
             ),
-            child: _imageUrl != null
-                ? CircleAvatar(
-                    radius: 65,
-                    backgroundImage: FileImage(File(_imageUrl!)),
-                  )
-                : const CircleAvatar(
-                    radius: 65,
-                    backgroundImage:
-                        NetworkImage('https://i.pravatar.cc/300?u=julian'),
-                  ),
+            child: CircleAvatar(
+              radius: 65,
+              backgroundImage: imageProvider,
+              backgroundColor: const Color(0xFFE8E8F3),
+            ),
           ),
           Positioned(
             bottom: 5,
@@ -208,11 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
           elevation: 10,
           shadowColor: const Color(0xFF2D5AFF).withOpacity(0.4),
         ),
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Changes saved correctly")),
-          );
-        },
+        onPressed: _saveChanges,
         child: const Text(
           "SAVE CHANGES",
           style: TextStyle(
@@ -224,6 +237,36 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveChanges() async {
+    try {
+      String? finalUrl = _imageUrl;
+
+      // Si hay bytes nuevos, subimos a Cloudinary
+      if (_imageBytes != null) {
+        finalUrl = await CloudinaryService.uploadImage(_imageBytes!);
+      }
+
+      await ProfileService.saveProfile(
+        name: _nameController.text,
+        bio: _bioController.text,
+        imageUrl: finalUrl,
+      );
+
+      NotificationService.show(
+        context,
+        title: "Success",
+        message: "Profile updated successfully",
+      );
+    } catch (e) {
+      NotificationService.show(
+        context,
+        title: "Error",
+        message: "Failed to save profile: $e",
+        isError: true,
+      );
+    }
   }
 
   Widget _buildDeleteAccount() {
@@ -262,23 +305,14 @@ class _ProfilePageState extends State<ProfilePage> {
       FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.image,
         allowMultiple: false,
+        withData: true,
       );
 
-      if (result != null && result.files.single.path != null) {
-        final String path = result.files.single.path!;
-
-        if (await File(path).exists()) {
-          setState(() {
-            _imageUrl = path;
-          });
-        } else {
-          NotificationService.show(
-            context,
-            title: "Error",
-            message: "Selected file is not accessible",
-            isError: true,
-          );
-        }
+      if (result != null) {
+        setState(() {
+          _imageBytes = result.files.single.bytes;
+          _imageUrl = result.files.single.name;
+        });
       }
     } catch (e) {
       NotificationService.show(
