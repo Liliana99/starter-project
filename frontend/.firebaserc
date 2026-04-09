@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "simetry-app"
+  },
+  "targets": {
+    "simetry-app": {
+      "hosting": {
+        "frontend": {
+          "targetIds": [
+            "frontend"
+          ],
+          "hostingSite": "simetry-app",
+          "source": "build/web"
+        }
+      }
+    }
+  }
+}
