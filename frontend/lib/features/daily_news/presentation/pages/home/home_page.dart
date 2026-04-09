@@ -124,10 +124,11 @@ class _HomePageState extends State<HomePage> {
               },
             )
           : const Text("KINETIC",
-              style: TextStyle(
+              style: TextStyle(  
                   letterSpacing: 2,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black)),
+                  color: Colors.black
+              )),
       centerTitle: true,
       actions: [
         IconButton(
@@ -147,8 +148,7 @@ class _HomePageState extends State<HomePage> {
         if (!_isSearching) ...[
           const CircleAvatar(
               radius: 14,
-              backgroundImage:
-                  NetworkImage('https://i.pravatar.cc/150?u=julian')),
+              backgroundImage:NetworkImage('https://i.pravatar.cc/150?u=julian')),
           const SizedBox(width: 16),
         ],
       ],
@@ -237,8 +237,7 @@ class _FilterChip extends StatelessWidget {
         color: isActive ? const Color(0xFF5C79FF) : const Color(0xFFE8E8F3),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        label,
+      child: Text(label,
         style: TextStyle(
           color: isActive ? Colors.white : const Color(0xFF5D5D81),
           fontWeight: FontWeight.w900,
